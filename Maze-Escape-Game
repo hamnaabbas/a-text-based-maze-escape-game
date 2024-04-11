@@ -1,0 +1,86 @@
+#include<iostream>
+using namespace std;
+void displayMaze( const int row, const int col,char **maze ) {
+    int ROWS = 5, COLS = 7;
+    for ( int i = 0; i < ROWS; ++i ) {
+        for ( int j = 0; j < COLS; ++j ) {
+            if ( i == row && j == col ) {
+                cout << 'P'; // Player's position
+            }
+            else {
+                cout << maze[i][j];
+            }
+        }
+        std::cout << '\n';
+    }
+}
+
+// Recursive function
+bool escapeMaze( int row, int col ) {
+    const int ROWS = 5;
+    const int COLS = 7;
+    char** maze = new char* [ROWS];//GRID
+    for ( int i = 0; i < ROWS; i++ )
+    {
+        maze[i] = new char[COLS];
+    }
+    for ( int i = 0; i < ROWS; i++ )
+    {
+        for ( int j = 0; j < COLS; j++ )
+        {
+            if ( ( i == 1 && j % 2 != 0 ) || ( i == 2 && j % 2 != 0 ) )
+            {
+                if ( i == 1 && j == 1 )
+                {
+                    maze[i][j] = 'P';
+                }
+                else if ( i == 1 && j == 5 )
+                {
+                    maze[i][j] = 'E';
+                }
+                else
+                    maze[i][j] = ' ';
+            }
+            else if ( ( i == 3 && j != 0 && j != 6 ) )
+            {
+                maze[i][j] = ' ';
+            }
+            else
+                maze[i][j] = '#';
+
+        }
+    }
+    if ( maze[row][col] == 'E' ) {
+        cout << "Congratulations! You escaped the maze!\n";
+        return true;
+    }
+    displayMaze( row, col,maze );
+
+    // Prompt the player for a move
+    char move;
+    cout << "Enter your move (W/A/S/D): ";
+    cin >> move;
+
+    // Update the player's position based on the move
+    int newRow = row, newCol = col;
+    switch ( move ) {
+    case 'W': newRow--; break;
+    case 'A': newCol--; break;
+    case 'S': newRow++; break;
+    case 'D': newCol++; break;
+    default:
+        cout << "Invalid move. Try again.\n";
+        return escapeMaze( row, col ); // Retry the same position
+    }
+
+    // Check for collisions with walls or outside the maze boundaries
+    if ( newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS &&
+        maze[newRow][newCol] != '#' ) {
+        return escapeMaze( newRow, newCol ); // Recurse to the new position
+    }
+    else {
+        cout << "Oops! You hit a wall. Try again.\n";
+        return escapeMaze( row, col ); // Retry the same position
+    }
+}
+
